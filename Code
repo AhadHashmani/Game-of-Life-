@@ -1,0 +1,72 @@
+LIVE = 'X'
+DEAD = '.'
+
+class Grid:
+    def __init__(self, size):
+        self.size = size
+        self.grid = [[DEAD for _ in range(size)] for _ in range(size)]
+
+    def __str__(self):
+        result = ""
+        for row in self.grid:
+            result += " ".join(row) + "\n"
+        return result
+
+    def getGridSize(self):
+        return self.size
+
+    def getCell(self, row, col):
+        return self.grid[row][col]
+
+    def setCell(self, row, col, value):
+        self.grid[row][col] = value
+
+    def isCellLive(self, row, col):
+        if 0 <= row < self.size and 0 <= col < self.size:
+            return 1 if self.grid[row][col] == LIVE else 0
+        return 0
+
+    def countLiveNeighbors(self, row, col):
+        count = 0
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                if not (i == 0 and j == 0):
+                    count += self.isCellLive(row + i, col + j)
+        return count
+
+def makeCellsLive(grid, cellsList):
+    for (row, col) in cellsList:
+        grid.setCell(row, col, LIVE)
+
+def stepGameOfLife(grid):
+    size = grid.getGridSize()
+    new_grid = [[DEAD for _ in range(size)] for _ in range(size)]
+    for row in range(size):
+        for col in range(size):
+            live_neighbors = grid.countLiveNeighbors(row, col)
+            if grid.getCell(row, col) == LIVE:
+                if live_neighbors < 2 or live_neighbors > 3:
+                    new_grid[row][col] = DEAD
+                else:
+                    new_grid[row][col] = LIVE
+            else:
+                if live_neighbors == 3:
+                    new_grid[row][col] = LIVE
+    grid.grid = new_grid
+
+def playGameOfLife(grid, n):
+    for _ in range(n):
+        stepGameOfLife(grid)
+
+if __name__ == "__main__":
+    grid = Grid(10)
+    GLIDER = [(0, 1), (1, 2), (2, 0), (2, 1), (2, 2)]
+    makeCellsLive(grid, GLIDER)
+    print("Initial Grid:")
+    print(grid)
+    stepGameOfLife(grid)
+    print("After one step:")
+    print(grid)
+    playGameOfLife(grid, 3)
+    print("After four steps in total:")
+    print(grid)
